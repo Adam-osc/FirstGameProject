@@ -1,4 +1,4 @@
-extends KinematicBody2D
+extends Area2D 
 
 
 # Declare member variables here. Examples:
@@ -7,6 +7,10 @@ var velocity = Vector2()
 var screen_size = Vector2()
 var sprite_buffer = Vector2()
 
+var health = 1
+
+const explosion_scene = preload("res://Explosion.tscn")
+
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	screen_size = get_viewport_rect().size
@@ -14,8 +18,15 @@ func _ready():
 	pass # Replace with function body.
 
 
+func die():
+	var explosion = explosion_scene.instance()
+	explosion.position = position
+	explosion.play("default")
+	get_node("/root").add_child(explosion)
+
+
 # Called every frame. 'delta' is the elapsed time since the previous frame.
-func _physics_process(delta):
+func _process(delta):
 	
 	velocity = Vector2()
 		
@@ -55,3 +66,12 @@ func _physics_process(delta):
 	
 	position.x = clamp(position.x, 0 + sprite_buffer.x, screen_size.x - sprite_buffer.x)
 	position.y = clamp(position.y, 0 + sprite_buffer.y, screen_size.y - sprite_buffer.y)
+
+	if health == 0:
+		die()
+		queue_free()
+		pass
+
+func _on_Area2D_body_entered(body):
+	health -= 1
+	pass
